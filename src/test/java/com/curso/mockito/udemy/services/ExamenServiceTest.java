@@ -1,11 +1,6 @@
 package com.curso.mockito.udemy.services;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -21,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
 import static org.mockito.Mockito.*;
 
@@ -145,9 +142,19 @@ public class ExamenServiceTest {
         examenConPreguntas.setPreguntas(Datos.PREGUNTAS);
 
         // Cuando guardamos las preguntas atraves del servicio
-        when(examenRepository.save(any(Examen.class))).thenReturn(Datos.EXAMEN);
+        when(examenRepository.save(any(Examen.class))).then(new Answer<Examen>() {
+            Long secuencia = 8L;
+
+            @Override
+            public Examen answer(InvocationOnMock invocation) throws Throwable {
+                Examen examen = invocation.getArgument(0);// Obteenmos el examen que recibe el save
+                examen.setId(secuencia++);// Vamos incrementando el id
+                return examen;
+            }
+        });
         Examen examen = examenService.save(examenConPreguntas);
 
+        //Then - Entonces verificamos 
         assertAll(
                 () -> assertNotNull(examen, () -> "El examen no debe ser nulo"),
                 () -> assertEquals(8L, examen.getId(), () -> "El examen no tiene el id correcto"),
