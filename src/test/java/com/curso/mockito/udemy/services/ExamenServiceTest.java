@@ -12,6 +12,7 @@ import com.curso.mockito.udemy.repositories.ExamenRepository;
 import com.curso.mockito.udemy.repositories.PreguntaRepository;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -399,6 +400,10 @@ public class ExamenServiceTest {
             verify(preguntaRepository).findPreguntasByExamenId(anyLong());
         }
 
+    }
+
+    @Nested
+    class OrdenNumeroEjecuciones {
         @Test
         void orden_de_invocacion_test() {// Nos permite verificar el orden de ejecucion de las dependencias
             when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
@@ -425,6 +430,53 @@ public class ExamenServiceTest {
             inOrder.verify(preguntaRepository).findPreguntasByExamenId(5L);
             inOrder.verify(examenRepository).findAll();
             inOrder.verify(preguntaRepository).findPreguntasByExamenId(6L);
+        }
+
+        @Test
+        void numero_de_invocaciones_test() {
+            when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+
+            examenService.findExamenPorNombreConPreguntas("Matematicas");
+            //Al menos
+            verify(preguntaRepository, times(1)).findPreguntasByExamenId(5L);
+            verify(preguntaRepository, atLeast(1)).findPreguntasByExamenId(5L);
+            verify(preguntaRepository, atLeastOnce()).findPreguntasByExamenId(5L);
+            //A lo mucho
+            verify(preguntaRepository, atMost(10)).findPreguntasByExamenId(5L);
+            verify(preguntaRepository, atMostOnce()).findPreguntasByExamenId(5L);
+        }
+
+      /*   @Test
+        void numero_de_invocaciones_tes2() {//Aplica cuando sacamos la lista de pregunta 2 veces
+            when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+
+            examenService.findExamenPorNombreConPreguntas("Matematicas");
+            //Al menos
+            //verify(preguntaRepository).findPreguntasByExamenId(5L); //Falla
+            verify(preguntaRepository, times(2)).findPreguntasByExamenId(5L);
+            verify(preguntaRepository, atLeast(1)).findPreguntasByExamenId(5L);
+            verify(preguntaRepository, atLeastOnce()).findPreguntasByExamenId(5L);
+            //A lo mucho
+            verify(preguntaRepository, atMost(10)).findPreguntasByExamenId(5L);
+            //verify(preguntaRepository, atMostOnce()).findPreguntasByExamenId(5L);//Falla
+        } */
+
+        @Test
+        void numero_de_invocaciones_tes3() {//Aplica cuando queremos decir que nunca se utilizara el metodo de un mock
+            when(examenRepository.findAll()).thenReturn(Collections.emptyList());
+
+            examenService.findExamenPorNombreConPreguntas("Matematicas");
+            
+            //Ninguna vez
+            verify(preguntaRepository, never()).findPreguntasByExamenId(5L);
+            verifyNoInteractions(preguntaRepository);
+
+            verify(examenRepository,times(1)).findAll();
+            verify(examenRepository,atLeast(1)).findAll();
+            verify(examenRepository,atLeastOnce()).findAll();
+            verify(examenRepository,atMost(1)).findAll();
+            verify(examenRepository,atMostOnce()).findAll();
+            
         }
     }
 }

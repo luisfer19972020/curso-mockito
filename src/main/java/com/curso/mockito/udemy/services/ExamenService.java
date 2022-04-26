@@ -34,6 +34,7 @@ public class ExamenService implements IExamenService {
         if (examenOptional.isPresent()) {
             examen = examenOptional.get();
             examen.setPreguntas(this.preguntaRepository.findPreguntasByExamenId(examen.getId()));
+            //examen.setPreguntas(this.preguntaRepository.findPreguntasByExamenId(examen.getId()));
         }
         return examen;
     }
