@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -210,5 +211,35 @@ public class ExamenServiceTest {
             // verify(preguntaRepository).findPreguntasByExamenId(eq(5L));
 
         }
+
+        @Test
+        void argumentsMatchersClassTest() {
+            when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+            when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+            Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas");
+
+            // Verificar que nuestros arguemntos se pasen correcatmente
+            assertTrue(examen instanceof Examen, () -> "Se debe devolver una instancia de examen");
+            verify(examenRepository).findAll();
+            verify(preguntaRepository).findPreguntasByExamenId(argThat(new MiArgsMatchers()));
+            // verify(preguntaRepository).findPreguntasByExamenId(eq(5L));
+        }
+       
+    }
+
+    class MiArgsMatchers implements ArgumentMatcher<Long> {
+        private Long argument;
+
+        @Override
+        public boolean matches(Long argument) {
+            this.argument = argument;
+            return argument != null && argument > 0L;
+        }
+
+        @Override
+        public String toString() {
+            return "El long " + argument + " no comple con la regla  NOT NULL y no es mayor a 0";
+        }
+
     }
 }
