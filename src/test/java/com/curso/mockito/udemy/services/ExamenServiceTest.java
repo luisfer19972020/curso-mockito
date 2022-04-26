@@ -359,5 +359,21 @@ public class ExamenServiceTest {
                     () -> verify(examenRepository).save(any(Examen.class)),
                     () -> verify(preguntaRepository).saveAll(any()));
         }
+
+        // Para hacer un llamado real del metodo[Para utilizarlo en una dependencia
+        // injectada debe ser una clase y no una interfaz]
+        @Test
+        void doCallRealMethod() {
+            when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+            // when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+
+            Mockito.doCallRealMethod().when(preguntaRepository).findPreguntasByExamenId(anyLong());
+            Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas");
+
+            assertEquals(5L, examen.getId());
+            assertEquals("Matematicas", examen.getNombre());
+            // No aseguramos que se mande a llamar el metodo real
+            assertEquals(0, examen.getPreguntas().size());
+        }
     }
 }
