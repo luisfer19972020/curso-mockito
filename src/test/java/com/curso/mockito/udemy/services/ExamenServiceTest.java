@@ -40,7 +40,7 @@ public class ExamenServiceTest {
 
     @Captor
     ArgumentCaptor<Long> captor;
-    
+
     // Si vamos a utililizar notaciones no podemos instanciar la intefaz sino la
     // clase implementada
 
@@ -260,5 +260,27 @@ public class ExamenServiceTest {
             return "El long " + argument + " no comple con la regla  NOT NULL y no es mayor a 0";
         }
 
+    }
+
+    @Nested
+    class MetodosDoSomething {
+        @Test
+        void testDoThrow() {
+            // Teneindo un examen con preguntas
+            Examen examen = Datos.EXAMEN;
+            examen.setPreguntas(Datos.PREGUNTAS);
+
+            // Cuando lanzmaos una excepcion IllegalArgumentException
+            // NOTA: este metodo doThrow e usa para devolver un error solo en metodos void
+            doThrow(IllegalArgumentException.class).when(preguntaRepository).saveAll(anyList());
+            // when(preguntaRepository.saveAll(anyList())).thenThrow(IllegalArgumentException.class);//Si
+            // el metodo retornara algo
+
+            // Entonces nos sercioramos que lancemos una excepcion de tipo
+            // IllegalArgumentException
+            assertThrows(IllegalArgumentException.class, () -> {
+                examenService.save(examen);
+            });
+        }
     }
 }
