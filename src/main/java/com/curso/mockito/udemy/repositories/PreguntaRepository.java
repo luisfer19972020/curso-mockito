@@ -12,7 +12,6 @@ public class PreguntaRepository implements IPreguntaRepository {
 
     @Override
     public void saveAll(List<String> preguntas) {
-        // TODO Auto-generated method stub
         
     }
     
