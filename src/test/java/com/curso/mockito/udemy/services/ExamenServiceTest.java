@@ -3,6 +3,7 @@ package com.curso.mockito.udemy.services;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
@@ -59,7 +60,7 @@ public class ExamenServiceTest {
         assertFalse(examen.isPresent(), () -> "El examen no ha sido devuelto");
     }
 
-    @DisplayName(value = "Se puede manejan errores por no encontrar lista vacia")
+    @DisplayName(value = "Se puede retornar un examen con una de sus preguntas")
     @Test
     void find_examen_por_nombre_con_preguntas() {
         // Simulamos la respuesta del reposiotrio es vacia
@@ -71,5 +72,36 @@ public class ExamenServiceTest {
         // Aserciones
         assertEquals(4, examen.getPreguntas().size(), () -> "No todas las preguntas fueron devueltas");
         assertTrue(examen.getPreguntas().contains("aritmetica"), () -> "No todas las preguntas fueron devueltas");
+    }
+
+    @DisplayName(value = "Se puede retornar un examen con una de sus preguntas comprobando sus invocaciones")
+    @Test
+    void find_examen_por_nombre_con_preguntas_verify() {
+        // Simulamos la respuesta del reposiotrio es vacia
+        when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+        when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas");
+
+        // Aserciones
+        assertEquals(4, examen.getPreguntas().size(), () -> "No todas las preguntas fueron devueltas");
+        assertTrue(examen.getPreguntas().contains("aritmetica"), () -> "No todas las preguntas fueron devueltas");
+        verify(examenRepository).findAll();
+        verify(preguntaRepository).findPreguntasByExamenId(anyLong());
+    }
+
+    @DisplayName(value = "Se puede retornar un examen sin sus preguntas comprobando sus invocaciones")
+    @Test
+    void find_examen_por_nombre_con_preguntas_verify_lista_vacia() {
+        // Simulamos la respuesta del reposiotrio es vacia
+        when(examenRepository.findAll()).thenReturn(Collections.emptyList());
+        when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas2");
+
+        // Aserciones
+        assertNull(examen, () -> "El examen no deberia de ser encontrado");
+        verify(examenRepository).findAll();
+        //verify(preguntaRepository).findPreguntasByExamenId(anyLong());
     }
 }
