@@ -1,31 +1,15 @@
 package com.curso.mockito.udemy.services;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumingThat;
-
-import java.util.Collections;
-import java.util.Optional;
-
 import com.curso.mockito.udemy.Datos;
 import com.curso.mockito.udemy.models.Examen;
 import com.curso.mockito.udemy.repositories.ExamenRepository;
 import com.curso.mockito.udemy.repositories.PreguntaRepository;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 
 import static org.mockito.Mockito.*;
 
