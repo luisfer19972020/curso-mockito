@@ -17,19 +17,36 @@ import com.curso.mockito.udemy.repositories.PreguntaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class ExamenServiceTest {
-    private ExamenRepository examenRepository;
-    private PreguntaRepository preguntaRepository;
-    private IExamenService examenService;
+
+    @Mock
+    ExamenRepository examenRepository;
+    @Mock
+    PreguntaRepository preguntaRepository;
+
+    @InjectMocks
+    ExamenService examenService;
+
+    // Si vamos a utililizar notaciones no podemos instanciar la intefaz sino la
+    // clase implementada
 
     @BeforeEach
     void setUp() {
+        //MockitoAnnotations Se puede remplazar notando la clase
+        //MockitoAnnotations.openMocks(this);// Habilitamos las notaciones para esta clase
         // Simulamos el repositorio que necesita el service
-        this.examenRepository = mock(ExamenRepository.class);
-        this.preguntaRepository = mock(PreguntaRepository.class);
-        this.examenService = new ExamenService(examenRepository, preguntaRepository);
+
+        // this.examenRepository = mock(ExamenRepository.class);
+        // this.preguntaRepository = mock(PreguntaRepository.class);
+        // this.examenService = new ExamenService(examenRepository, preguntaRepository);
     }
 
     @DisplayName(value = "Se puede encontrar un examen por nombre")
@@ -95,13 +112,13 @@ public class ExamenServiceTest {
     void find_examen_por_nombre_con_preguntas_verify_lista_vacia() {
         // Simulamos la respuesta del reposiotrio es vacia
         when(examenRepository.findAll()).thenReturn(Collections.emptyList());
-        when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+        //when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
 
         Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas2");
 
         // Aserciones
         assertNull(examen, () -> "El examen no deberia de ser encontrado");
         verify(examenRepository).findAll();
-        //verify(preguntaRepository).findPreguntasByExamenId(anyLong());
+        // verify(preguntaRepository).findPreguntasByExamenId(anyLong());
     }
 }
