@@ -15,7 +15,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -36,6 +38,9 @@ public class ExamenServiceTest {
     @InjectMocks
     ExamenService examenService;
 
+    @Captor
+    ArgumentCaptor<Long> captor;
+    
     // Si vamos a utililizar notaciones no podemos instanciar la intefaz sino la
     // clase implementada
 
@@ -224,7 +229,21 @@ public class ExamenServiceTest {
             verify(preguntaRepository).findPreguntasByExamenId(argThat(new MiArgsMatchers()));
             // verify(preguntaRepository).findPreguntasByExamenId(eq(5L));
         }
-       
+
+        @Test
+        void ArgumentCaptorTest() {
+            when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+            when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+            examenService.findExamenPorNombreConPreguntas("Matematicas");
+
+            // Para capturar el argumento
+            // Esto se puede hacer con la notacon captor
+            // ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
+            verify(preguntaRepository).findPreguntasByExamenId(captor.capture());
+            assertEquals(5L, captor.getValue());
+
+        }
+
     }
 
     class MiArgsMatchers implements ArgumentMatcher<Long> {
