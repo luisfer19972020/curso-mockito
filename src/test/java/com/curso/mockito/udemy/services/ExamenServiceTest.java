@@ -194,4 +194,21 @@ public class ExamenServiceTest {
             verify(preguntaRepository).findPreguntasByExamenId(isNull());
         }
     }
+
+    @Nested
+    class ArgumentosTest {
+        @Test
+        void argumentsMatchersTest() {
+            when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+            when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+            Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas");
+
+            // Verificar que nuestros arguemntos se pasen correcatmente
+            assertTrue(examen instanceof Examen, () -> "Se debe devolver una instancia de examen");
+            verify(examenRepository).findAll();
+            verify(preguntaRepository).findPreguntasByExamenId(argThat(arg -> arg != null && arg >= 5L));
+            // verify(preguntaRepository).findPreguntasByExamenId(eq(5L));
+
+        }
+    }
 }
