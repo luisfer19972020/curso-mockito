@@ -375,5 +375,27 @@ public class ExamenServiceTest {
             // No aseguramos que se mande a llamar el metodo real
             assertEquals(0, examen.getPreguntas().size());
         }
+
+        @Test
+        void testSpy() {
+            // Forma de crear un mock
+            // ExamenRepository examenRepository = mock(ExamenRepository.class);
+            // Forma de crear un spy (Solo se puede con clases concretas)
+            ExamenRepository examenRepository = spy(ExamenRepository.class);
+            PreguntaRepository preguntaRepository = spy(PreguntaRepository.class);
+            ExamenService examenService = new ExamenService(examenRepository, preguntaRepository);
+
+            // Este es el que manda
+            // when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+            // Para evitar llamar el metodo [ExamenRepository.findAll() - metodo real] del
+            // objeto real cuando usamos el mock debemos usar el doReturn
+            doReturn(Datos.EXAMENES).when(examenRepository).findAll();
+
+            Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas");
+            assertNotNull(examen, () -> "La clase debe ser nula");
+            assertEquals("Matematicas", examen.getNombre());
+            verify(examenRepository).findAll();
+            verify(preguntaRepository).findPreguntasByExamenId(anyLong());
+        }
     }
 }

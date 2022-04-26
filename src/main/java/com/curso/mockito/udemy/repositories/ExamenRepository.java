@@ -9,11 +9,14 @@ public class ExamenRepository implements IExamenRepository {
 
     @Override
     public List<Examen> findAll() {
-        return Collections.emptyList(); 
-        /* Arrays.asList(
-                new Examen(5L, "Matematicas"),
-                new Examen(6L, "Lenguaje"),
-                new Examen(7L, "Historia")); */
+        System.out.println("ExamenRepository.findAll() - metodo real");
+        return Collections.emptyList();
+        /*
+         * Arrays.asList(
+         * new Examen(5L, "Matematicas"),
+         * new Examen(6L, "Lenguaje"),
+         * new Examen(7L, "Historia"));
+         */
     }
 
     @Override
