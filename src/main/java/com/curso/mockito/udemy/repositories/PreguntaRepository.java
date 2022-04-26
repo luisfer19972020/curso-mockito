@@ -9,5 +9,11 @@ public class PreguntaRepository implements IPreguntaRepository {
     public List<String> findPreguntasByExamenId(Long id) {
         return Collections.emptyList();
     }
+
+    @Override
+    public void saveAll(List<String> preguntas) {
+        // TODO Auto-generated method stub
+        
+    }
     
 }

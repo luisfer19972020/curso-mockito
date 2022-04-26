@@ -3,6 +3,7 @@ package com.curso.mockito.udemy.services;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,8 +41,9 @@ public class ExamenServiceTest {
 
     @BeforeEach
     void setUp() {
-        //MockitoAnnotations Se puede remplazar notando la clase
-        //MockitoAnnotations.openMocks(this);// Habilitamos las notaciones para esta clase
+        // MockitoAnnotations Se puede remplazar notando la clase
+        // MockitoAnnotations.openMocks(this);// Habilitamos las notaciones para esta
+        // clase
         // Simulamos el repositorio que necesita el service
 
         // this.examenRepository = mock(ExamenRepository.class);
@@ -112,7 +114,7 @@ public class ExamenServiceTest {
     void find_examen_por_nombre_con_preguntas_verify_lista_vacia() {
         // Simulamos la respuesta del reposiotrio es vacia
         when(examenRepository.findAll()).thenReturn(Collections.emptyList());
-        //when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+        // when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
 
         Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas2");
 
@@ -120,5 +122,38 @@ public class ExamenServiceTest {
         assertNull(examen, () -> "El examen no deberia de ser encontrado");
         verify(examenRepository).findAll();
         // verify(preguntaRepository).findPreguntasByExamenId(anyLong());
+    }
+
+    @DisplayName(value = "Se puede guardar un examen sin preguntas")
+    @Test
+    void save() {
+        when(examenRepository.save(any(Examen.class))).thenReturn(Datos.EXAMEN);
+        Examen examen = examenService.save(Datos.EXAMEN);
+
+        assertAll(
+                () -> assertNotNull(examen, () -> "El examen no debe ser nulo"),
+                () -> assertEquals(8L, examen.getId(), () -> "El examen no tiene el id correcto"),
+                () -> assertEquals("Fisica", examen.getNombre(), () -> "El examen no tiene el id correcto"),
+                () -> verify(examenRepository).save(any(Examen.class)));
+    }
+
+    @DisplayName(value = "Se puede guardar un examen con preguntas")
+    @Test
+    void save_with_questions() {
+        // Teniendo un examen con preguntas
+        Examen examenConPreguntas = Datos.EXAMEN;
+        examenConPreguntas.setPreguntas(Datos.PREGUNTAS);
+
+        // Cuando guardamos las preguntas atraves del servicio
+        when(examenRepository.save(any(Examen.class))).thenReturn(Datos.EXAMEN);
+        Examen examen = examenService.save(examenConPreguntas);
+
+        assertAll(
+                () -> assertNotNull(examen, () -> "El examen no debe ser nulo"),
+                () -> assertEquals(8L, examen.getId(), () -> "El examen no tiene el id correcto"),
+                () -> assertEquals("Fisica", examen.getNombre(), () -> "El examen no tiene el id correcto"),
+                () -> assertEquals(4, examen.getPreguntas().size(), () -> "El examen no tiene todas la preguntas"),
+                () -> verify(examenRepository).save(any(Examen.class)),
+                () -> verify(preguntaRepository).saveAll(any()));
     }
 }

@@ -16,4 +16,10 @@ public class ExamenRepository implements IExamenRepository {
                 new Examen(7L, "Historia")); */
     }
 
+    @Override
+    public Examen save(Examen examen) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

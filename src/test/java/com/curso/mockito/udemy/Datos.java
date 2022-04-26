@@ -15,4 +15,5 @@ public class Datos {
             "integrales",
             "trigonometria",
             "geometria");
+    public final static Examen EXAMEN = new Examen(8L, "Fisica");
 }
