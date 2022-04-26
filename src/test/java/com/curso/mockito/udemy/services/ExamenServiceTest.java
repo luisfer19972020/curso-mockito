@@ -1,6 +1,7 @@
 package com.curso.mockito.udemy.services;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumingThat;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
@@ -281,6 +283,81 @@ public class ExamenServiceTest {
             assertThrows(IllegalArgumentException.class, () -> {
                 examenService.save(examen);
             });
+        }
+
+        @Test
+        void doAnswer() {
+            // Teniendo un servicio de exmaen
+            when(examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+            // when(preguntaRepository.findPreguntasByExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+            // NOTA: Otra forma de hacer el awser del then
+            Mockito.doAnswer(invocation -> {
+                Long id = invocation.getArgument(0);
+                return id == 5L ? Datos.PREGUNTAS : null;
+            }).when(preguntaRepository).findPreguntasByExamenId(anyLong());
+
+            // Cuandobuscamos una pregunta con sus examenes
+            Examen examen = examenService.findExamenPorNombreConPreguntas("Matematicas");
+
+            // Asertamos que nos devuelva la preguntas correctas
+            assumingThat(examen.getNombre().equals("Matematicas"), () -> {
+                assertAll(
+                        () -> assertEquals(5L, examen.getId(), () -> "El examen no tien el id correcto"),
+                        () -> assertEquals("Matematicas", examen.getNombre(),
+                                () -> "El examen no tien el nombre correcto"),
+                        () -> assertEquals(4, examen.getPreguntas().size(),
+                                () -> "El exmane no tiene todas las preguntas"));
+            });
+            assumingThat(!examen.getNombre().equals("Matematicas"), () -> {
+                assertAll(
+                        () -> assertNull(examen.getPreguntas(),
+                                () -> "El exmane no deberia tener preguntas"));
+            });
+            verify(preguntaRepository).findPreguntasByExamenId(anyLong());
+        }
+
+        @DisplayName(value = "Se puede guardar un examen con preguntas")
+        @Test
+        void save_with_questions_do_answer() {
+            // Teniendo un examen con preguntas
+            Examen examenConPreguntas = Datos.EXAMEN;
+            examenConPreguntas.setPreguntas(Datos.PREGUNTAS);
+
+            // Cuando guardamos las preguntas atraves del servicio
+            /*
+             * when(examenRepository.save(any(Examen.class))).then(new Answer<Examen>() {
+             * Long secuencia = 8L;
+             * 
+             * @Override
+             * public Examen answer(InvocationOnMock invocation) throws Throwable {
+             * Examen examen = invocation.getArgument(0);// Obteenmos el examen que recibe
+             * el save
+             * examen.setId(secuencia++);// Vamos incrementando el id
+             * return examen;
+             * }
+             * });
+             */
+            Mockito.doAnswer(new Answer<Examen>() {
+                Long secuencia = 8L;
+
+                @Override
+                public Examen answer(InvocationOnMock invocation) throws Throwable {
+                    Examen examen = invocation.getArgument(0);// Obteenmos el examen que recibe
+                    // el save
+                    examen.setId(secuencia++);// Vamos incrementando el id
+                    return examen;
+                }
+            }).when(examenRepository).save(any(Examen.class));
+            Examen examen = examenService.save(examenConPreguntas);
+
+            // Then - Entonces verificamos
+            assertAll(
+                    () -> assertNotNull(examen, () -> "El examen no debe ser nulo"),
+                    () -> assertEquals(8L, examen.getId(), () -> "El examen no tiene el id correcto"),
+                    () -> assertEquals("Fisica", examen.getNombre(), () -> "El examen no tiene el id correcto"),
+                    () -> assertEquals(4, examen.getPreguntas().size(), () -> "El examen no tiene todas la preguntas"),
+                    () -> verify(examenRepository).save(any(Examen.class)),
+                    () -> verify(preguntaRepository).saveAll(any()));
         }
     }
 }
